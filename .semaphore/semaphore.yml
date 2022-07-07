@@ -38,13 +38,13 @@ blocks:
 promotions:
   - name: Production deploy
     pipeline_file: production-deploy.yml
-    auto_promote_on:
-      - branch: master
+    auto_promote:
+      when: "result = 'passed' and branch = 'master'"
   - name: Staging deploy
     pipeline_file: staging-deploy.yml
-    auto_promote_on:
-      - branch: staging
+    auto_promote:
+      when: "result = 'passed' and branch = 'staging'"
   - name: Development deploy
     pipeline_file: development-deploy.yml
-    auto_promote_on:
-      - branch: development
+    auto_promote:
+      when: "result = 'passed' and branch = 'development'"
