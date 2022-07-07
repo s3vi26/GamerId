@@ -1,0 +1,16 @@
+version: v1.0
+name: Deploy to development
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Deploy
+    task:
+      jobs:
+        - name: Development
+          commands:
+            - npm install -g serverless
+            - serverless config credentials --provider aws --key AWS_ACCESS_KEY --secret AWS_SECRET_KEY
+            - tsc
+            - sls deploy

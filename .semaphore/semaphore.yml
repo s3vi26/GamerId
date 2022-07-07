@@ -1,20 +1,53 @@
 version: v1.0
-name: Test MyApp
+name: Gamer Id
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu2004
 
 blocks:
-  - name: Test
+  - name: Install Dependancies
     task:
-      jobs:
-        - name: Test
+      secrets:
+        - name: AWS_ACCESS_KEY
+        - name: AWS_SECRET_KEY
+      prologue:
+        commands:
+          - checkout
+          - nvm use
+          - node --version
+          - npm --version
+      jobs: Install Dependancies
+        - name: NPM Install - server
           commands:
-            - checkout
-            - sem-version node 12
-            - cache restore
+            - cache restore server-node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),server-node-modules-$SEMAPHORE_GIT_BRANCH,server-node-modules-master
             - npm install
-            - cache store
-            - npm run build --if-present
-            - npm test
+            - cache store server-node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json) node_modules
+
+        # - name: NPM Install - client
+        #   commands:
+        #     - cd app/
+        #     # Restore dependencies from cache. This command will not fail in
+        #     # case of a cache miss. In case of a cache hit, npm install will
+        #     # run very fast.
+        #     # For more info on caching, see https://docs.semaphoreci.com/article/68-caching-dependencies
+        #     - cache restore client-node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),client-node-modules-$SEMAPHORE_GIT_BRANCH,client-node-modules-master
+        #     - npm install
+
+        #     # Store the latest version of node modules in cache to reuse in
+        #     # further blocks:
+        #     - cache store client-node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json) node_modules
+
+promotions:
+  - name: Production deploy
+    pipeline_file: production-deploy.yml
+    auto_promote:
+      when: "result = 'passed'" and branch = 'master'"
+  - name: Staging deploy
+    pipeline_file: staging-deploy.yml
+    auto_promote:
+      when: "result = 'passed'" and branch = 'staging'"
+  - name: Development deploy
+    pipeline_file: development-deploy.yml
+    auto_promote:
+      when: "result = 'passed'" and branch = 'development'"
