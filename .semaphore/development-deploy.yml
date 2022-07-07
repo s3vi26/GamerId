@@ -8,11 +8,11 @@ blocks:
   - name: Deploy
     task:
       secrets:
-        - name: AWS_ACCESS_KEY
-        - name: AWS_SECRET_KEY
+        - name: GamerId
       jobs:
         - name: Development
           commands:
+            - sem get secret GamerId
             - npm install -g serverless
             - serverless config credentials --provider aws --key AWS_ACCESS_KEY --secret AWS_SECRET_KEY
             - tsc
