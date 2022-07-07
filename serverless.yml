@@ -1,0 +1,77 @@
+service: gamer-id
+frameworkVersion: "3"
+
+plugins:
+  - serverless-dotenv-plugin
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: "20201221"
+  environment:
+    STAGE: ${env:STAGE}
+    DYNAMODB_TABLE: gamers-${env:STAGE}
+  httpApi:
+    cors: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  create:
+    handler: functions/gamers/create.create
+    events:
+      - http:
+          path: gamers
+          method: post
+          cors: true
+
+  list:
+    handler: functions/gamers/list.list
+    events:
+      - http:
+          path: gamers
+          method: get
+          cors: true
+
+  get:
+    handler: functions/gamers/get.get
+    events:
+      - http:
+          path: gamers/{id}
+          method: get
+          cors: true
+
+  update:
+    handler: functions/gamers/update.update
+    events:
+      - http:
+          path: gamers/{id}
+          method: put
+          cors: true
+
+resources:
+  Resources:
+    GamersDynamoDbTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: gamerId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: gamerId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
