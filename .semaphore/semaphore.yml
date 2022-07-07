@@ -14,7 +14,7 @@ blocks:
           - nvm use
           - node --version
           - npm --version
-      jobs: Install Dependancies
+      jobs:
         - name: NPM Install - server
           commands:
             - cache restore server-node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),server-node-modules-$SEMAPHORE_GIT_BRANCH,server-node-modules-master
