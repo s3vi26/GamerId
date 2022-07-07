@@ -7,6 +7,9 @@ agent:
 blocks:
   - name: Deploy
     task:
+      secrets:
+        - name: AWS_ACCESS_KEY
+        - name: AWS_SECRET_KEY
       jobs:
         - name: Development
           commands:
