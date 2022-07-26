@@ -25,12 +25,12 @@ module.exports.update = (event, context, callback) => {
       gamerId: event.pathParameters.id,
     },
     ExpressionAttributeValues: {
-      ":email": data.email,
       ":phone": data.phone,
+      ":username": data.username,
       ":updatedAt": timestamp,
     },
     UpdateExpression:
-      "SET email = :email, phone = :phone, updatedAt = :updatedAt",
+      "SET username = :username, phone = :phone, updatedAt = :updatedAt",
     ReturnValues: "ALL_NEW",
   };
 
